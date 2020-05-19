@@ -15,6 +15,8 @@ references are:
 
 
 > react-native-fs 로 파일을 관리합니다
+
+
 > react-native-video 로 디바이스의 파일 또는 특정 주소의 비디오를 재생합니다.
 
 
