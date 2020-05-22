@@ -10,6 +10,7 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@react-native-community/netinfo": "^5.9.0",
     "eslint-config-prettier": "^6.11.0",
     "lodash.last": "^3.0.0",
     "react": "16.11.0",

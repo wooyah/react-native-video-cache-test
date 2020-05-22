@@ -1,17 +1,27 @@
 import React, { useState, useEffect } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity } from 'react-native';
+import { StyleSheet, View, Text, TouchableOpacity, Alert } from 'react-native';
 import Video from 'react-native-video';
 import RNFS from 'react-native-fs';
 import last from 'lodash.last';
+import NetInfo from '@react-native-community/netinfo';
 
 export default function App() {
   const [filePath, setFilePath] = useState('');
   const [percentage, setPercentage] = useState(0);
+  const [wifiConnected, setWifiConnected] = useState(false);
 
   const videoUrl =
     'https://cdn.plyr.io/static/demo/View_From_A_Blue_Moon_Trailer-720p.mp4';
   let filename = last(videoUrl.split('/'));
   let path_name = `${RNFS.DocumentDirectoryPath}/${filename}`;
+
+  const checkWiFiConnected = async () => {
+    NetInfo.fetch().then((state) => {
+      console.log('Connection type', state.type);
+      console.log('Is connected?', state.isConnected);
+      setWifiConnected(state.isConnected);
+    });
+  };
 
   const checkVideoFileExists = () => {
     RNFS.exists(path_name).then((exists) => {
@@ -26,7 +36,7 @@ export default function App() {
     const percentage = Math.floor(
       (response.bytesWritten / response.contentLength) * 100,
     );
-    console.log('[*] Download is ' + percentage + '% DONE!');
+    console.log('[*] Download is ' + percentage + '% DONE!' , response.contentLength);
     setPercentage(percentage);
   };
 
@@ -35,7 +45,13 @@ export default function App() {
     console.log('[*] Start Download! JobId: ' + jobId);
   };
 
-  const downloadVideoFile = () => {
+  const downloadVideoFile = async () => {
+      await checkWiFiConnected();
+      if (!wifiConnected) {
+          Alert.alert('No Wifi');
+          return false;
+      }
+
     RNFS.downloadFile({
       fromUrl: videoUrl,
       toFile: path_name.replace(/%20/g, '_'),
@@ -65,6 +81,7 @@ export default function App() {
 
   useEffect(() => {
     checkVideoFileExists();
+    checkWiFiConnected();
   }, []);
 
   return (
@@ -84,11 +101,11 @@ export default function App() {
         muted={false}
         ignoreSilentSwitch={null}
         fullscreen={true}
-        repeat={false}
+        repeat={true}
         //   controls={true}
       />
       <TouchableOpacity style={styles.button} onPress={downloadVideoFile}>
-        <Text style={styles.buttonText}>DOWNLOAD</Text>
+        <Text style={styles.buttonText}>DOWNLOAD / Wifi: [{wifiConnected.toString()}]</Text>
       </TouchableOpacity>
       <View>
         <Text>Pregress: {percentage} %</Text>
@@ -109,7 +126,7 @@ const styles = StyleSheet.create({
   },
   backgroundVideo: {
     position: 'relative',
-    width: 300,
+    width: '100%',
     height: 200,
   },
   button: {
