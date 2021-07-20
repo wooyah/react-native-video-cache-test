@@ -14,7 +14,7 @@
     "eslint-config-prettier": "^6.11.0",
     "lodash.last": "^3.0.0",
     "react": "16.11.0",
-    "react-native": "0.62.2",
+    "react-native": "0.62.3",
     "react-native-fs": "^2.16.6",
     "react-native-video": "^4.4.5"
   },
